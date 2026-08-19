@@ -1,0 +1,26 @@
+{
+  "model": "RandomForest",
+  "mae": 951944.2208214301,
+  "rmse": 3430537.385779442,
+  "r2": 0.9335133774649697,
+  "cv_rmse": 6556826.188931797,
+  "cv_std": 2478950.261851511,
+  "n_train": 76210,
+  "n_test": 19053,
+  "features": {
+    "numeric": [
+      "carpet_area_sqft",
+      "floor_num",
+      "bathroom_num",
+      "balcony_num",
+      "car_parking_num"
+    ],
+    "categorical": [
+      "location_grouped",
+      "Furnishing",
+      "Transaction",
+      "Ownership",
+      "society_grouped"
+    ]
+  }
+}
