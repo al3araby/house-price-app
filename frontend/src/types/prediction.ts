@@ -4,6 +4,7 @@ export interface PredictionRequest {
   floor_num: number;
   bathroom: number;
   balcony: number;
+  car_parking_num: number;
   furnishing: 'Furnished' | 'Semi-Furnished' | 'Unfurnished';
   transaction: 'New Property' | 'Resale' | 'Other' | 'Rent/Lease';
   ownership: 'Freehold' | 'Co-operative Society' | 'Power Of Attorney' | 'Leasehold';
