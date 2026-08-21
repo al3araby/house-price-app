@@ -14,6 +14,7 @@ import {
 import { cn } from '../lib/utils';
 import type { PredictionRequest } from '../types/prediction';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useStaggeredScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface PropertySpecsGridProps {
   request: PredictionRequest;
@@ -35,8 +36,16 @@ const SPEC_CONFIG = [
 export function PropertySpecsGrid({ request }: PropertySpecsGridProps) {
   const reducedMotion = useReducedMotion();
 
+  // Staggered scroll animation for spec items
+  const { ref: gridRef, visibleItems } = useStaggeredScrollAnimation(SPEC_CONFIG.length, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -10% 0px',
+    triggerOnce: true,
+    staggerDelay: 60,
+  });
+
   return (
-    <section aria-label="Property specifications" className="w-full">
+    <section aria-label="Property specifications" className="w-full" ref={gridRef}>
       <h2 className="sr-only">Property Details</h2>
       <div
         className={cn(
@@ -51,6 +60,7 @@ export function PropertySpecsGrid({ request }: PropertySpecsGridProps) {
         role="list"
       >
         {SPEC_CONFIG.map((spec, index) => {
+          const isVisible = visibleItems[index];
           const Icon = spec.icon;
           const value = spec.getValue(request);
           const isEven = index % 2 === 0;
@@ -58,9 +68,9 @@ export function PropertySpecsGrid({ request }: PropertySpecsGridProps) {
           return (
             <motion.article
               key={spec.key}
-              initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: reducedMotion ? 0 : index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              initial={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+              animate={isVisible && !reducedMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: reducedMotion ? 0 : index * 0.05, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
                 'flex items-center gap-4 rounded-xl p-4 transition-colors duration-150 ease-out-expo',
                 'group relative overflow-hidden',

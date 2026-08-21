@@ -55,9 +55,9 @@ export function ResultPage() {
     return (
       <div className="min-h-screen bg-background font-body flex items-center justify-center">
         <NavBar apiStatus={apiStatus} />
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="h-20 w-64 bg-elevated rounded-xl" />
-          <div className="h-4 w-32 bg-elevated rounded" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-20 w-64 skeleton-shimmer animate-shimmer rounded-xl" />
+          <div className="h-4 w-32 skeleton-shimmer animate-shimmer rounded" />
         </div>
       </div>
     );

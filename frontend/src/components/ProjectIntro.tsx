@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Database, BrainCircuit, Code2, Users } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface ProjectIntroProps {
   defaultOpen?: boolean;
@@ -57,6 +58,13 @@ export function ProjectIntro({ defaultOpen = false, onToggle }: ProjectIntroProp
   const reducedMotion = useReducedMotion();
   const contentId = 'project-intro-content';
 
+  // Scroll-triggered entrance animation
+  const { ref: sectionRef, isVisible } = useScrollAnimation({
+    threshold: 0.15,
+    rootMargin: '0px 0px -10% 0px',
+    triggerOnce: true,
+  });
+
   const toggle = () => {
     const newOpen = !open;
     setOpen(newOpen);
@@ -64,16 +72,36 @@ export function ProjectIntro({ defaultOpen = false, onToggle }: ProjectIntroProp
   };
 
   return (
-    <section className="w-full">
-      <button
+    <section className="w-full" ref={sectionRef}>
+      <motion.div
+        initial={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        animate={isVisible && !reducedMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="group/toggle relative overflow-hidden">
+          {/* Accent line that expands on hover - always visible when open */}
+          {!reducedMotion && (
+            <motion.div
+              initial={{ scaleX: open ? 1 : 0 }}
+              animate={{ scaleX: open ? 1 : 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="absolute top-0 left-0 right-0 h-0.5 origin-left bg-gradient-to-r from-accent via-[#3b82f6] to-[#25d366]"
+            />
+          )}
+          {!reducedMotion && (
+            <div
+              className="absolute top-0 left-0 right-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-accent via-[#3b82f6] to-[#25d366] transition-transform duration-300 ease-out-expo group-hover/toggle:scale-x-100"
+            />
+          )}
+          <button
         type="button"
         onClick={toggle}
         aria-expanded={open}
         aria-controls={contentId}
-        className="group flex w-full items-center justify-between gap-4 rounded-xl border border-border bg-surface px-6 py-5 text-left transition-colors duration-150 ease-out-expo hover:border-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="group flex w-full items-center justify-between gap-4 rounded-xl border border-border bg-surface px-6 py-5 text-left transition-all duration-300 ease-out-expo hover:border-accent/50 hover:bg-elevated/60 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <div>
-          <h2 className="font-display text-heading-md font-semibold text-text">About this Project</h2>
+          <h2 className="font-display text-heading-md font-semibold text-text transition-colors duration-200 group-hover:text-accent">About this Project</h2>
           <p className="mt-1 text-body-sm text-muted">
             How the prediction works: data, model, stack, and team
           </p>
@@ -105,15 +133,34 @@ export function ProjectIntro({ defaultOpen = false, onToggle }: ProjectIntroProp
                   initial={reducedMotion ? false : { opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: reducedMotion ? 0 : i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col gap-3 rounded-xl border border-border bg-elevated/50 p-5"
+                  whileHover={
+                    reducedMotion
+                      ? undefined
+                      : {
+                          y: -6,
+                          scale: 1.025,
+                          boxShadow: '0 20px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--color-accent)20',
+                          transition: { type: 'spring', stiffness: 400, damping: 25 },
+                        }
+                  }
+                  className="group flex flex-col gap-3 rounded-xl border border-border bg-elevated/50 p-5 transition-all duration-500 ease-out-expo hover:border-accent/60 hover:bg-elevated/80 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5),0_0_0_1px_rgba(20,200,168,0.15)]"
                 >
                   <div className="flex items-center gap-2">
-                    <col.icon className="h-5 w-5 text-accent" aria-hidden="true" />
-                    <h3 className="font-display text-heading-sm font-semibold text-text">{col.title}</h3>
+                    <motion.div
+                      whileHover={reducedMotion ? undefined : { scale: 1.15, rotate: 8 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 transition-colors duration-300 group-hover:bg-accent/20"
+                    >
+                      <col.icon className="h-5 w-5 text-accent transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+                    </motion.div>
+                    <h3 className="font-display text-heading-sm font-semibold text-text transition-colors duration-300 group-hover:text-accent">{col.title}</h3>
                   </div>
                   <ul className="flex flex-col gap-2">
                     {col.items.map((item, idx) => (
-                      <li key={idx} className="text-body-sm leading-relaxed text-muted">
+                      <li
+                        key={idx}
+                        className="text-body-sm leading-relaxed text-muted transition-colors duration-300 group-hover:text-text/90"
+                      >
                         {item}
                       </li>
                     ))}
@@ -124,6 +171,8 @@ export function ProjectIntro({ defaultOpen = false, onToggle }: ProjectIntroProp
           </motion.div>
         )}
       </AnimatePresence>
+        </div>
+      </motion.div>
     </section>
   );
 }

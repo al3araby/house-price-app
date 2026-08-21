@@ -1,6 +1,9 @@
 import * as React from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { type ToastOptions } from '../hooks/useToast';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface PredictionFormCardProps {
   children: React.ReactNode;
@@ -19,9 +22,23 @@ export function PredictionFormCard({
   error,
   onDismissError,
 }: PredictionFormCardProps) {
+  const reducedMotion = useReducedMotion();
+
+  // Scroll-triggered entrance animation
+  const { ref: cardRef, isVisible } = useScrollAnimation({
+    threshold: 0.2,
+    rootMargin: '0px 0px -15% 0px',
+    triggerOnce: true,
+  });
+
   return (
-    <section aria-labelledby="form-title" className="w-full max-w-2xl mx-auto">
-      <div className="relative rounded-2xl border border-border bg-surface shadow-lg p-6 sm:p-8 lg:p-10">
+    <section aria-labelledby="form-title" className="w-full max-w-2xl mx-auto" ref={cardRef}>
+      <motion.div
+        initial={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        animate={isVisible && !reducedMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="relative rounded-2xl border border-border bg-surface shadow-lg p-6 sm:p-8 lg:p-10">
         <header className="mb-8">
           <h2 id="form-title" className="font-display text-heading-md font-semibold text-text">
             {title}
@@ -84,6 +101,7 @@ export function PredictionFormCard({
           {children}
         </div>
       </div>
+    </motion.div>
     </section>
   );
 }

@@ -50,10 +50,15 @@ export function ToastViewport({ toasts, onDismiss }: ToastViewportProps) {
             <motion.div
               key={toast.id}
               layout={!reducedMotion}
-              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: 100 }}
-              animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-              exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 100 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              initial={reducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8, x: 100 }}
+              animate={reducedMotion ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1, x: 0 }}
+              exit={reducedMotion ? { opacity: 0, scale: 0.8 } : { opacity: 0, scale: 0.8, x: 100 }}
+              transition={{
+                type: 'spring',
+                stiffness: 500,
+                damping: 35,
+                mass: 0.8,
+              }}
               role={isError ? 'alert' : 'status'}
               aria-live={isError ? 'assertive' : 'polite'}
               className={cn(

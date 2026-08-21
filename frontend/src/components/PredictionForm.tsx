@@ -93,26 +93,26 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
 
   if (!mounted) {
     return (
-      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-6 animate-pulse" aria-busy="true">
+      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-6" aria-busy="true">
         <div className="space-y-4" role="status" aria-label="Loading form">
-          <div className="h-10 w-3/4 bg-elevated rounded-lg" />
+          <div className="h-10 w-3/4 skeleton-shimmer animate-shimmer rounded-lg" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-10 w-full bg-elevated rounded-lg" />
-            <div className="h-10 w-full bg-elevated rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-10 w-full bg-elevated rounded-lg" />
-            <div className="h-10 w-full bg-elevated rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-10 w-full bg-elevated rounded-lg" />
-            <div className="h-10 w-full bg-elevated rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-10 w-full bg-elevated rounded-lg" />
-            <div className="h-10 w-full bg-elevated rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
+            <div className="h-10 w-full skeleton-shimmer animate-shimmer rounded-lg" />
           </div>
-          <div className="h-12 w-full bg-elevated rounded-lg" />
+          <div className="h-12 w-full skeleton-shimmer animate-shimmer rounded-lg" />
         </div>
       </form>
     );
@@ -122,8 +122,8 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
     <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-6" noValidate>
       {/* Group 1: Location + Area */}
       <div className="space-y-4">
-        <h3 className="font-display text-heading-sm font-semibold text-text">Location & Area</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <h3 className="font-display text-heading-sm font-semibold text-text whitespace-nowrap">Location & Area</h3>
+        <div className="grid gap-4 sm:grid-cols-2 min-w-0">
           <div>
             <Label htmlFor="location">Location</Label>
             <Combobox
@@ -132,6 +132,7 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
               onChange={(v) => setValue('location', v, { shouldValidate: true })}
               options={locations}
               placeholder="Select location..."
+              loading={apiStatus === 'checking'}
               error={!!errors.location}
               errorText={errors.location?.message}
               disabled={isSubmitting}
@@ -163,8 +164,8 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
 
       {/* Group 2: Floor + Bathrooms + Balconies + Parking */}
       <div className="space-y-4">
-        <h3 className="font-display text-heading-sm font-semibold text-text">Property Configuration</h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <h3 className="font-display text-heading-sm font-semibold text-text whitespace-nowrap">Property Configuration</h3>
+        <div className="grid gap-4 grid-cols-2">
           <div>
             <Label htmlFor="floor_num">Floor</Label>
             <Stepper
@@ -241,8 +242,8 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
 
       {/* Group 3: Furnishing + Transaction + Ownership + Facing */}
       <div className="space-y-4">
-        <h3 className="font-display text-heading-sm font-semibold text-text">Details</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <h3 className="font-display text-heading-sm font-semibold text-text whitespace-nowrap">Details</h3>
+        <div className="grid gap-4 sm:grid-cols-2 min-w-0">
           <div>
             <Label htmlFor="furnishing">Furnishing</Label>
             <Select onValueChange={(v) => setValue('furnishing', v as any)}>
