@@ -81,7 +81,7 @@ house-price-app/
 ### 1. Clone and Setup Backend
 
 ```bash
-git clone https://github.com/<your-username>/house-price-app.git
+git clone https://github.com/al3araby/house-price-app.git
 cd house-price-app/backend
 
 # Create virtual environment
