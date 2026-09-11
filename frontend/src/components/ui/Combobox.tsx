@@ -187,6 +187,20 @@ export function Combobox({
           </motion.div>
         </AnimatePresence>
       </SelectPrimitive.Portal>
+
+      {/* Validation error - rendered below the trigger so it's conveyed to the user */}
+      {errorText && (
+        <motion.p
+          id={`${id}-error`}
+          className="mt-1.5 text-body-sm text-danger"
+          role="alert"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {errorText}
+        </motion.p>
+      )}
     </SelectPrimitive.Root>
   );
 }

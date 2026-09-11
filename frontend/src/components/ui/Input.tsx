@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
@@ -77,20 +77,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       props.onChange?.(e);
     };
 
-    // Transform for label animation - use string template for CSS compatibility
-    const labelTransform = reducedMotion ? {} : {
-      transform: `translateY(${springLabelY.get()}px) scale(${springLabelScale.get()})`,
-      opacity: springLabelOpacity.get(),
-      transformOrigin: 'left top',
-    } as React.CSSProperties;
-
-    // Glow effect - use motion value directly
+    // Glow effect - reactive boxShadow built from motion values
     const glowSpread = useTransform(springGlow, [0, 1], [0, 20]);
     const glowBlur = useTransform(springGlow, [0, 1], [0, 4]);
     const glowOpacity = useTransform(springGlow, [0, 1], ['00', '40']);
-    const glowStyle = reducedMotion ? {} : {
-      boxShadow: `0 0 ${glowSpread.get()}px ${glowBlur.get()}px ${error ? 'var(--color-danger)' : 'var(--color-accent)'}${glowOpacity.get()}`,
-    } as React.CSSProperties;
+    const glowColor = error ? 'var(--color-danger)' : 'var(--color-accent)';
+    const glowStyle = reducedMotion
+      ? undefined
+      : { boxShadow: useMotionTemplate`0 0 ${glowSpread}px ${glowBlur}px ${glowColor}${glowOpacity}` };
 
     return (
       <div className="w-full relative">
@@ -98,7 +92,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <motion.label
             htmlFor={inputId}
             className="absolute left-4 top-3.5 text-body-sm font-medium text-muted pointer-events-none transition-colors duration-fast ease-out-expo z-10"
-            style={labelTransform}
+            style={{
+              y: springLabelY,
+              scale: springLabelScale,
+              opacity: springLabelOpacity,
+              transformOrigin: 'left top',
+            }}
             initial={false}
             animate={{ opacity: hasValue || isFocused ? 1 : 0 }}
           >
@@ -106,7 +105,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {props.required && <span className="text-danger ml-1" aria-hidden="true">*</span>}
           </motion.label>
         )}
-        <div
+        <motion.div
           className="relative"
           style={glowStyle}
         >
@@ -147,7 +146,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />
           )}
-        </div>
+        </motion.div>
         {(helperText || errorText) && (
           <motion.p
             id={`${inputId}-desc`}

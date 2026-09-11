@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { Minus, Plus } from 'lucide-react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
@@ -39,32 +39,20 @@ export function Stepper({
   const describedBy = [helperText, errorText].filter(Boolean).join(' ') ? `${inputId}-desc` : ariaDescribedBy;
   const reducedMotion = useReducedMotion();
   const [isFocused, setIsFocused] = React.useState(false);
-  const [activeButton, setActiveButton] = React.useState<'decrement' | 'increment' | null>(null);
 
-  // Motion values for button press animation
-  const decrementScale = useMotionValue(1);
-  const incrementScale = useMotionValue(1);
-  const springDecrement = useSpring(decrementScale, { stiffness: 500, damping: 30 });
-  const springIncrement = useSpring(incrementScale, { stiffness: 500, damping: 30 });
+  const canDecrement = !disabled && value > min;
+  const canIncrement = !disabled && value < max;
 
   const decrement = () => {
     if (disabled) return;
     const newVal = Math.max(min, value - step);
     onChange(newVal);
-    if (!reducedMotion) {
-      decrementScale.set(0.85);
-      setTimeout(() => decrementScale.set(1), 100);
-    }
   };
 
   const increment = () => {
     if (disabled) return;
     const newVal = Math.min(max, value + step);
     onChange(newVal);
-    if (!reducedMotion) {
-      incrementScale.set(0.85);
-      setTimeout(() => incrementScale.set(1), 100);
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,21 +72,6 @@ export function Stepper({
   };
 
   const handleFocus = () => setIsFocused(true);
-
-  const handleMouseDown = (btn: 'decrement' | 'increment') => {
-    if (disabled) return;
-    setActiveButton(btn);
-  };
-
-  const handleMouseUp = () => {
-    setActiveButton(null);
-  };
-
-  const handleMouseLeaveButton = () => {
-    if (activeButton === 'decrement') decrementScale.set(1);
-    if (activeButton === 'increment') incrementScale.set(1);
-    setActiveButton(null);
-  };
 
   return (
     <div className="w-full">
@@ -126,22 +99,16 @@ export function Stepper({
         <motion.button
           type="button"
           onClick={decrement}
-          onMouseDown={() => handleMouseDown('decrement')}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeaveButton}
-          disabled={disabled || value <= min}
+          disabled={disabled || !canDecrement}
           className={cn(
             'flex h-11 w-11 shrink-0 items-center justify-center text-text hover:bg-elevated transition-colors relative z-10',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'rounded-l-lg'
           )}
           aria-label="Decrease"
-          aria-disabled={disabled || value <= min}
-          style={{
-            transform: reducedMotion ? undefined : { scale: springDecrement },
-            transformOrigin: 'center',
-          } as React.CSSProperties}
-          whileHover={!reducedMotion && !disabled && value > min ? { scale: 1.05, backgroundColor: 'var(--color-elevated)' } : undefined}
+          aria-disabled={disabled || !canDecrement}
+          whileHover={!reducedMotion && canDecrement ? { scale: 1.05, backgroundColor: 'var(--color-elevated)' } : undefined}
+          whileTap={!reducedMotion && canDecrement ? { scale: 0.85 } : undefined}
         >
           <Minus className="h-6 w-6 transition-transform duration-fast flex-shrink-0" aria-hidden="true" />
         </motion.button>
@@ -172,22 +139,16 @@ export function Stepper({
         <motion.button
           type="button"
           onClick={increment}
-          onMouseDown={() => handleMouseDown('increment')}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeaveButton}
-          disabled={disabled || value >= max}
+          disabled={disabled || !canIncrement}
           className={cn(
             'flex h-11 w-11 shrink-0 items-center justify-center text-text hover:bg-elevated transition-colors relative z-10',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'rounded-r-lg'
           )}
           aria-label="Increase"
-          aria-disabled={disabled || value >= max}
-          style={{
-            transform: reducedMotion ? undefined : { scale: springIncrement },
-            transformOrigin: 'center',
-          } as React.CSSProperties}
-          whileHover={!reducedMotion && !disabled && value < max ? { scale: 1.05, backgroundColor: 'var(--color-elevated)' } : undefined}
+          aria-disabled={disabled || !canIncrement}
+          whileHover={!reducedMotion && canIncrement ? { scale: 1.05, backgroundColor: 'var(--color-elevated)' } : undefined}
+          whileTap={!reducedMotion && canIncrement ? { scale: 0.85 } : undefined}
         >
           <Plus className="h-6 w-6 transition-transform duration-fast flex-shrink-0" aria-hidden="true" />
         </motion.button>

@@ -95,20 +95,19 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
             <span className="text-body-sm font-medium text-muted">{property.location}</span>
           </div>
         ) : (
-          <img
+          <motion.img
             src={property.imageUrl}
             alt={`${property.bhk} property in ${property.location}`}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
+            animate={{ scale: isHovered && !reducedMotion ? 1.05 : 1 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'h-full w-full object-cover transition-all duration-700 ease-out-expo',
-              imageLoaded ? 'opacity-100' : 'opacity-0',
-              isHovered && !reducedMotion ? 'scale-105' : 'scale-100'
+              'h-full w-full object-cover will-change-transform',
+              'transition-opacity duration-300',
+              imageLoaded ? 'opacity-100' : 'opacity-0'
             )}
-            style={{
-              transform: reducedMotion ? undefined : { scale: isHovered ? 1.05 : 1 },
-            } as React.CSSProperties}
           />
         )}
         <div

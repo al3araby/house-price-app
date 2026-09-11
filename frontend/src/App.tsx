@@ -4,7 +4,6 @@ import { ResultPage } from './pages/ResultPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import Preloader from './components/Preloader';
 import { PageTransition } from './components/PageTransition';
-import './App.css';
 
 function App() {
   return (

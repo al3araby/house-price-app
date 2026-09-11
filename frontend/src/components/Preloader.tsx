@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 export default function Preloader() {
   const [done, setDone] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    // Total timeline (~3.9s) then fade out. Safety timeout prevents the
+    // Total timeline (~1.6s) then a fast fade out. Safety timeout prevents the
     // preloader from ever blocking the app if an animation is interrupted.
-    const finish = setTimeout(() => setDone(true), 3900);
-    const safety = setTimeout(() => setDone(true), 7000);
+    const finish = setTimeout(() => setDone(true), 1600);
+    const safety = setTimeout(() => setDone(true), 4000);
     return () => {
       clearTimeout(finish);
       clearTimeout(safety);
@@ -24,15 +26,15 @@ export default function Preloader() {
           className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#050505]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          transition={reducedMotion ? { duration: 0.15 } : { duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex w-full max-w-[500px] flex-col items-center px-8">
             {/* Logo */}
             <motion.div
               className="flex flex-col items-center"
-              initial={{ opacity: 0, y: 30, scale: 0.92 }}
+              initial={reducedMotion ? false : { opacity: 0, y: 30, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
+              transition={reducedMotion ? { duration: 0.01 } : { duration: 0.7, ease: "easeOut" }}
             >
               <img
                 src="/logo.png"
@@ -58,16 +60,16 @@ export default function Preloader() {
             {/* Loading */}
             <motion.div
               className="mt-14 w-full"
-              initial={{ opacity: 0, y: 10 }}
+              initial={reducedMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.6 }}
+              transition={reducedMotion ? { duration: 0.01 } : { duration: 0.4, ease: "easeOut", delay: 0.4 }}
             >
               <div className="relative h-[2px] w-full overflow-hidden bg-[#292317]">
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-[#7c5b24] via-[#f1cf78] to-[#8c672b]"
-                  initial={{ scaleX: 0 }}
+                  initial={reducedMotion ? false : { scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 1.8, ease: "easeInOut", delay: 0.9 }}
+                  transition={reducedMotion ? { duration: 0.01 } : { duration: 0.9, ease: "easeInOut" }}
                   style={{ transformOrigin: "left center" }}
                 />
 

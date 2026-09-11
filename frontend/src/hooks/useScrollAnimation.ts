@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useMotionValue } from 'framer-motion';
 
 interface ScrollAnimationOptions {
   threshold?: number | number[];
@@ -135,10 +136,12 @@ export function useStaggeredScrollAnimation(itemCount: number, options: ScrollAn
 }
 
 /**
- * Hook for parallax scroll effect
+ * Hook for parallax scroll effect.
+ * Returns a Framer Motion value (not React state) so scroll updates drive the
+ * transform without triggering re-renders. Offset is in px (speed × distance).
  */
 export function useParallax(speed: number = 0.3) {
-  const [offset, setOffset] = useState(0);
+  const offset = useMotionValue(0);
   const elementRef = useRef<HTMLElement | null>(null);
   const rafRef = useRef<number | null>(null);
 
@@ -163,7 +166,7 @@ export function useParallax(speed: number = 0.3) {
         const viewportCenter = viewportHeight / 2;
         const distance = (elementCenter - viewportCenter) / viewportHeight;
 
-        setOffset(distance * speed * 100);
+        offset.set(distance * speed * 100);
       });
     };
 
@@ -176,7 +179,7 @@ export function useParallax(speed: number = 0.3) {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [speed]);
+  }, [speed, offset]);
 
   return { ref: setRef, offset };
 }

@@ -57,6 +57,7 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
     handleSubmit,
     setValue,
     watch,
+    getValues,
     formState: { errors, isValid },
   } = useForm<PredictionRequest>({
     resolver: zodResolver(predictionSchema) as any,
@@ -77,10 +78,11 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
 
   // Auto-select first location if available
   React.useEffect(() => {
-    if (locations.length > 0 && !watch('location')) {
+    // getValues is a stable snapshot read that avoids the RHF compiler lint.
+    if (locations.length > 0 && !getValues('location')) {
       setValue('location', locations[0], { shouldValidate: true });
     }
-  }, [locations, setValue, watch]);
+  }, [locations, setValue, getValues]);
 
   const onSubmitHandler = async (data: PredictionRequest) => {
     try {
@@ -128,6 +130,7 @@ export function PredictionForm({ onSubmit, isSubmitting = false, locations, apiS
             <Label htmlFor="location">Location</Label>
             <Combobox
               id="location"
+              // oxlint-disable-next-line react/incompatible-library -- RHF watch value for controlled combobox
               value={watch('location')}
               onChange={(v) => setValue('location', v, { shouldValidate: true })}
               options={locations}

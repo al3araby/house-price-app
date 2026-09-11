@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, animate as animateValue } from 'framer-motion';
+import { CheckCircle2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { formatIndianCurrency, formatPriceForScreenReader } from '../lib/formatters';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -13,6 +14,8 @@ interface PriceHeroProps {
 export function PriceHero({ price, location, animate = true }: PriceHeroProps) {
   const reducedMotion = useReducedMotion();
   const shouldAnimate = animate && !reducedMotion;
+  // Without animation the count is final immediately, so treat it as complete.
+  const [countComplete, setCountComplete] = React.useState(() => !shouldAnimate);
 
   const formatted = formatIndianCurrency(price);
   const screenReaderText = formatPriceForScreenReader(price);
@@ -25,20 +28,19 @@ export function PriceHero({ price, location, animate = true }: PriceHeroProps) {
 
   React.useEffect(() => {
     if (shouldAnimate) {
+      // Animate the count on the motion value; onComplete is async so no
+      // synchronous setState in the effect, and the spring stays interruptible.
       count.set(0);
-      const duration = 800;
-      const start = Date.now();
-      const animate = () => {
-        const elapsed = Date.now() - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        count.set(eased * formatted.rawLac);
-        if (progress < 1) requestAnimationFrame(animate);
-      };
-      requestAnimationFrame(animate);
-    } else {
-      count.set(formatted.rawLac);
+      const controls = animateValue(count, formatted.rawLac, {
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+        onComplete: () => setCountComplete(true),
+      });
+      return () => controls.stop();
     }
+    count.set(formatted.rawLac);
+    // Non-animated path: state was already initialised to !shouldAnimate === true
+    // on mount, so no setState needed here.
   }, [price, shouldAnimate, count, formatted.rawLac]);
 
   return (
@@ -52,6 +54,19 @@ export function PriceHero({ price, location, animate = true }: PriceHeroProps) {
         aria-live="polite"
         className="group"
       >
+        {/* One-shot success cue when the count-up lands */}
+        {shouldAnimate && countComplete && (
+          <motion.div
+            className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+            initial={{ scale: 0.7, opacity: 1 }}
+            animate={{ scale: 1.35, opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            aria-hidden="true"
+          >
+            <div className="h-64 w-64 rounded-full border-2 border-accent/40" />
+          </motion.div>
+        )}
+
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-baseline gap-3">
             <motion.span
@@ -78,6 +93,22 @@ export function PriceHero({ price, location, animate = true }: PriceHeroProps) {
               </>
             )}
           </div>
+
+          {/* Success chip — springs in once the count-up lands */}
+          <AnimatePresence>
+            {shouldAnimate && countComplete && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-4 py-1.5"
+              >
+                <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" />
+                <span className="text-body-sm font-medium text-success">Price estimated</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Screen reader only announcement */}

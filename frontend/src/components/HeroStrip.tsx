@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useTransform } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { PropertyCard, type PropertyShowcase } from './PropertyCard';
@@ -90,8 +90,9 @@ export function HeroStrip({ properties = DEFAULT_PROPERTIES, snapAlign = 'start'
     staggerDelay: 100,
   });
 
-  // Subtle parallax effect for section background
+  // Subtle parallax effect for section background (motion value — no re-renders)
   const { ref: parallaxRef, offset: parallaxOffset } = useParallax(0.15);
+  const parallaxY = useTransform(parallaxOffset, (v) => v * 0.3);
 
   const updateScrollButtons = React.useCallback(() => {
     const el = scrollRef.current;
@@ -132,9 +133,7 @@ export function HeroStrip({ properties = DEFAULT_PROPERTIES, snapAlign = 'start'
       {!reducedMotion && (
         <motion.div
           className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
-          style={{
-            transform: `translateY(${parallaxOffset * 0.3}px)`,
-          }}
+          style={{ y: parallaxY }}
           aria-hidden="true"
         >
           <div
