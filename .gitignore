@@ -46,3 +46,4 @@ dist/
 # Local dev tooling
 .claude/
 plans/
+.ulpi/
