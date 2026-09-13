@@ -252,6 +252,7 @@ curl -X POST http://localhost:8000/api/v1/predict \
 ## Development
 
 ### Run Backend Tests
+> Requires `backend/models/house_price.pkl` and `locations.json` to exist first (see "Run Notebook" above, or copy them as shown in step 1) — the tests load the real model.
 ```bash
 cd backend
 pytest tests/ -v
