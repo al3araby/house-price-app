@@ -1,0 +1,48 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pkl
+.pytest_cache/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Environment
+.env
+*.env.local
+*.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (too large for GitHub)
+notebooks/data/house_prices.csv
+backend/models/house_price.pkl
+house-price.zip
+
+# Jupyter
+*.ipynb_checkpoints/
+
+# Build
+build/
+dist/
+
+# Logs
+*.log
+
+# Local dev tooling
+.claude/
+plans/

@@ -62,7 +62,9 @@ export function PropertySpecsGrid({ request }: PropertySpecsGridProps) {
         {SPEC_CONFIG.map((spec, index) => {
           const isVisible = visibleItems[index];
           const Icon = spec.icon;
-          const value = spec.getValue(request);
+          const rawValue = spec.getValue(request);
+          // Guard against a missing value ever rendering as literal "undefined"
+          const value = rawValue == null || rawValue === 'undefined' ? '—' : rawValue;
           const isEven = index % 2 === 0;
 
           return (
